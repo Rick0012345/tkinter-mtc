@@ -2,58 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import customtkinter as ctk
 import sqlite3
-from database import gerardb
+from database import gerardb,adicionar_paciente_db, adicionar_medicamento_db, carregar_pacientes_db, carregar_medicamentos_db
 
-# As funções adicionadas abaixo, no geral, interagem com a db. Recomendo moverem para database.py depois.
-
-# Não gosto de aplicar mudanças radicais no código, mas é necessário algumas funções para o Tkinter adicionar e carregar pacientes e medicamentos.
-# Isso me lembra que é necessário poder apagar pacientes também.
-# Mas isso implica criar um botão para isso, que significa usar Tkinter (ou Ctk), que significa que eu não farei isso.
-
-# Gerar db
 gerardb()
 
-# Conectar db
-def conectardb():
-    return sqlite3.connect('controle_medicamentos.db')
-
-# Adicionar paciente
-def adicionar_paciente_db(nome, idade, endereco):
-    sqconnect = conectardb()
-    sqcursor = sqconnect.cursor()
-    sqcursor.execute('INSERT INTO pacientes (nome, idade, endereco) VALUES (?, ?, ?)', (nome, idade, endereco))
-    sqconnect.commit()
-    sqconnect.close()
-
-# Adicionar medicamento
-def adicionar_medicamento_db(nome, estoque, vencimento):
-    sqconnect = conectardb()
-    sqcursor = sqconnect.cursor()
-    sqcursor.execute('INSERT INTO medicamentos (nome, estoque, vencimento) VALUES (?, ?, ?)', (nome, estoque, vencimento))
-    sqconnect.commit()
-    sqconnect.close()
-
-# Carregar pacientes
-def carregar_pacientes_db(tree):
-    sqconnect = conectardb()
-    sqcursor = sqconnect.cursor()
-    sqcursor.execute('SELECT nome, idade, endereco FROM pacientes')
-    for row in sqcursor.fetchall(): # Peguei emprestado do código de exemplo anterior. É a mesma coisa, mas ele insere, sequencialmente, cada coluna extraída pelo fetchall().
-        tree.insert("", tk.END, values=row)
-        # Rachei a cabeça com isso; tkinter cria janelas que são variáveis. O treeview, por exemplo, é uma variável.
-        # Mas isso significa que, se há um método que deve alterar os elementos da variável do treeview, eu preciso chamar ela como argumento do método.¹
-    sqconnect.close()
-
-# Carregar medicamentos
-def carregar_medicamentos_db(tree):
-    sqconnect = conectardb()
-    sqcursor = sqconnect.cursor()
-    sqcursor.execute('SELECT nome, estoque, vencimento FROM medicamentos')
-    for row in sqcursor.fetchall():
-        tree.insert("", tk.END, values=row)
-    sqconnect.close()
-
-# Configurações básicas da janela principal
 root = ctk.CTk()
 root.title("MTC - Controle de Medicamentos")
 root.geometry("1200x600")  # Ajuste o tamanho da janela
