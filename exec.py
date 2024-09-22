@@ -171,23 +171,23 @@ class JanelaPrincipal:
         if not selecionado:
             messagebox.showerror("Erro", "Nenhum paciente selecionado")
             return
-        
+        else:
         # Obter dados do paciente selecionado
-        paciente_selecionado = self.tree_pacientes.item(selecionado[0], "values")
-        nome = paciente_selecionado[0]
-        idade = paciente_selecionado[1]
-        endereco = paciente_selecionado[2]
-        cpf = paciente_selecionado[3]  # Supondo que o CPF é o quarto campo (índice 3)
-        
-        # Remover paciente do banco de dados
-        deletar_paciente_db(nome,idade,endereco,cpf)
+            paciente_selecionado = self.tree_pacientes.item(selecionado[0], "values")
+            # nome = paciente_selecionado[0]
+            # idade = paciente_selecionado[1]
+            # endereco = paciente_selecionado[2]
+            cpf = paciente_selecionado[3]  # Supondo que o CPF é o quarto campo (índice 3)
+            
+            # Remover paciente do banco de dados
+            deletar_paciente_db(cpf)
 
-        # Atualizar a Treeview
-        self.limpar_treeview(self.tree_pacientes)
-        carregar_pacientes_db(self.tree_pacientes)
+            # Atualizar a Treeview
+            self.limpar_tv_pacientes(self.tree_pacientes)
+            carregar_pacientes_db(self.tree_pacientes)
 
-        messagebox.showinfo("Sucesso", "Paciente removido com sucesso!")
-        
+            messagebox.showinfo("Sucesso", "Paciente removido com sucesso!")
+            
     def atualizar_dados(self):
             n1 = self.inp_nome.get()
             n2 = self.inp_idade.get()
@@ -202,7 +202,7 @@ class JanelaPrincipal:
             editar_paciente_db(n4, n1, n2, n3)  # CPF não muda, mas os outros dados sim
             
             # Limpar TreeView e recarregar os dados
-            self.limpar_treeview(self.tree_pacientes)
+            self.limpar_campos_pacientes(self.tree_pacientes)
             carregar_pacientes_db(self.tree_pacientes)
             
             messagebox.showinfo("Sucesso", "Paciente atualizado com sucesso!")
