@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import customtkinter as ctk
-from database import carregar_pacientes_db, carregar_medicamentos_db
+from database import carregar_pacientes_db, carregar_medicamentos_db,adicionar_paciente_db, editar_paciente_db, deletar_paciente_db
 
 class JanelaPrincipal:
     def __init__(self):
@@ -54,32 +54,45 @@ class JanelaPrincipal:
         pacientes_janela.deiconify()
 
         # Frame para exibir e manipular os pacientes
-        frame_pacientes = ctk.CTkFrame(pacientes_janela)
-        frame_pacientes.pack(fill="both", expand=True)
+        self.frame_pacientes = ctk.CTkFrame(pacientes_janela)
+        self.frame_pacientes.pack(fill="both", expand=True)
 
         # Botões para Adicionar, Remover e Editar Pacientes
-        btn_adicionar_paciente = ctk.CTkButton(frame_pacientes, text="Adicionar Paciente", command=self.adicionar_paciente)
+        btn_adicionar_paciente = ctk.CTkButton(self.frame_pacientes, text="Adicionar Paciente", command=self.adicionar_paciente)
         btn_adicionar_paciente.grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        btn_remover_paciente = ctk.CTkButton(frame_pacientes, text="Remover Paciente", command=self.remover_paciente)
+        btn_remover_paciente = ctk.CTkButton(self.frame_pacientes, text="Remover Paciente", command=self.remover_paciente)
         btn_remover_paciente.grid(row=1, column=1, padx=10, pady=10, sticky="w")
-        btn_editar_paciente = ctk.CTkButton(frame_pacientes, text="Editar Paciente", command=self.editar_paciente)
+        btn_editar_paciente = ctk.CTkButton(self.frame_pacientes, text="Editar Paciente", command=None)
         btn_editar_paciente.grid(row=1, column=2, padx=10, pady=10, sticky="w")
 
+        #entradas_para inserção de novo paciente
+        self.inp_nome = ctk.CTkEntry(self.frame_pacientes, placeholder_text="Nome")
+        self.inp_nome.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+
+        self.inp_idade = ctk.CTkEntry(self.frame_pacientes, placeholder_text="Idade")
+        self.inp_idade.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+
+        self.inp_endereco = ctk.CTkEntry(self.frame_pacientes, placeholder_text="Endereço")
+        self.inp_endereco.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
+
+        self.inp_CPF = ctk.CTkEntry(self.frame_pacientes, placeholder_text="CPF")
+        self.inp_CPF.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+
         # Configuração do TreeView para os pacientes
-        columns_pacientes = ("Nome", "Idade", "Endereço")
-        tree_pacientes = ttk.Treeview(frame_pacientes, columns=columns_pacientes, show="headings", height=15)
+        self.columns_pacientes = ("Nome", "Idade", "Endereço", "CPF")
+        self.tree_pacientes = ttk.Treeview(self.frame_pacientes, columns=self.columns_pacientes, show="headings", height=15)
         
-        for col in columns_pacientes:
-            tree_pacientes.heading(col, text=col)
-            tree_pacientes.column(col, width=150, anchor=tk.CENTER)
+        for col in self.columns_pacientes:
+            self.tree_pacientes.heading(col, text=col)
+            self.tree_pacientes.column(col, width=150, anchor=tk.CENTER)
 
-        tree_pacientes.grid(row=0, column=0, padx=10, pady=10, sticky="nsew", columnspan=3)
-        frame_pacientes.grid_columnconfigure(0, weight=1)
+        self.tree_pacientes.grid(row=0, column=0, padx=10, pady=10, sticky="nsew", columnspan=3)
+        self.frame_pacientes.grid_columnconfigure(0, weight=1)
         
-        # Carregar pacientes do banco de dados
-        carregar_pacientes_db(tree_pacientes)
+        
+        carregar_pacientes_db(self.tree_pacientes)
 
-    # Função para abrir a janela de Medicamentos
+    
     def abrir_janela_medicamentos(self):
         medicamentos_janela = ctk.CTkToplevel(self.root)
         medicamentos_janela.title("Medicamentos")
@@ -103,6 +116,7 @@ class JanelaPrincipal:
         columns_medicamentos = ("Nome do Medicamento", "Estoque", "Vencimento")
         tree_medicamentos = ttk.Treeview(frame_medicamentos, columns=columns_medicamentos, show="headings", height=15)
         
+        #carregando os dados atualizados
         for col in columns_medicamentos:
             tree_medicamentos.heading(col, text=col)
             tree_medicamentos.column(col, width=150, anchor=tk.CENTER)
@@ -115,22 +129,89 @@ class JanelaPrincipal:
 
     # Funções para manipulação (ações fictícias)
     def adicionar_paciente(self):
-        messagebox.showinfo("Adicionar Paciente", "Função de adicionar paciente aqui")
-        
-    def remover_paciente(self):
-        messagebox.showinfo("Remover Paciente", "Função de remover paciente aqui")
-        
-    def editar_paciente(self):
-        messagebox.showinfo("Editar Paciente", "Função de editar paciente aqui")
-        
-    def adicionar_medicamento(self):
-        messagebox.showinfo("Adicionar Medicamento", "Função de adicionar medicamento aqui")
-        
-    def remover_medicamento(self):
-        messagebox.showinfo("Remover Medicamento", "Função de remover medicamento aqui")
-        
-    def editar_medicamento(self):
-        messagebox.showinfo("Editar Medicamento", "Função de editar medicamento aqui")
+        n1 = self.inp_nome.get()
+        n2 = self.inp_idade.get()
+        n3 = self.inp_endereco.get()
+        n4 = self.inp_CPF.get()
 
+        if n1 == "" or n2 == "" or n3 == "" or n4 == "":
+            messagebox.showerror("Erro", "Todos os campos devem ser preenchidos")
+            return
+        else:
+            # Limpa o TreeView para evitar duplicações
+            self.limpar_tv_pacientes(self.tree_pacientes)
+
+            adicionar_paciente_db(n1, n2, n3, n4)
+            for col in self.columns_pacientes:
+                self.tree_pacientes.heading(col, text=col)
+                self.tree_pacientes.column(col, width=150, anchor=tk.CENTER)
+
+            self.tree_pacientes.grid(row=0, column=0, padx=10, pady=10, sticky="nsew", columnspan=3)
+            self.frame_pacientes.grid_columnconfigure(0, weight=1)
+            
+            
+            carregar_pacientes_db(self.tree_pacientes)
+            self.limpar_campos_pacientes()
+            
+
+    def limpar_campos_pacientes(self):
+
+        self.inp_nome.delete(0, tk.END)
+        self.inp_idade.delete(0, tk.END)
+        self.inp_endereco.delete(0, tk.END)
+        self.inp_CPF.delete(0, tk.END)
+
+    def limpar_tv_pacientes(self, treeview):
+        # Remove todas as linhas existentes
+        for item in treeview.get_children():
+            treeview.delete(item)
+
+    def remover_paciente(self):
+        selecionado = self.tree_pacientes.selection()
+        if not selecionado:
+            messagebox.showerror("Erro", "Nenhum paciente selecionado")
+            return
+        else:
+        # Obter dados do paciente selecionado
+            paciente_selecionado = self.tree_pacientes.item(selecionado[0], "values")
+            # nome = paciente_selecionado[0]
+            # idade = paciente_selecionado[1]
+            # endereco = paciente_selecionado[2]
+            cpf = paciente_selecionado[3]  # Supondo que o CPF é o quarto campo (índice 3)
+            
+            # Remover paciente do banco de dados
+            deletar_paciente_db(cpf)
+
+            # Atualizar a Treeview
+            self.limpar_tv_pacientes(self.tree_pacientes)
+            carregar_pacientes_db(self.tree_pacientes)
+
+            messagebox.showinfo("Sucesso", "Paciente removido com sucesso!")
+            
+    def atualizar_dados(self):
+            n1 = self.inp_nome.get()
+            n2 = self.inp_idade.get()
+            n3 = self.inp_endereco.get()
+            n4 = self.inp_CPF.get()
+
+            if n1 == "" or n2 == "" or n3 == "" or n4 == "":
+                messagebox.showerror("Erro", "Todos os campos devem ser preenchidos")
+                return
+            
+            # Atualizar o paciente no banco de dados
+            editar_paciente_db(n4, n1, n2, n3)  # CPF não muda, mas os outros dados sim
+            
+            # Limpar TreeView e recarregar os dados
+            self.limpar_campos_pacientes(self.tree_pacientes)
+            carregar_pacientes_db(self.tree_pacientes)
+            
+            messagebox.showinfo("Sucesso", "Paciente atualizado com sucesso!")
+            self.limpar_campos_paciente()
+
+            # Botão de confirmar atualização
+            btn_confirmar_edicao = ctk.CTkButton(self.frame_pacientes, text="Confirmar Edição", command=self.atualizar_dados)
+            btn_confirmar_edicao.grid(row=6, column=0, padx=10, pady=10, sticky="ew")
+        
+   
 # Inicializar a aplicação
 JanelaPrincipal()
