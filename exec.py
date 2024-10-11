@@ -145,7 +145,7 @@ class JanelaPrincipal:
             for col in self.columns_pacientes:
                 self.tree_pacientes.heading(col, text=col)
                 self.tree_pacientes.column(col, width=150, anchor=tk.CENTER)
-
+            
             self.tree_pacientes.grid(row=0, column=0, padx=10, pady=10, sticky="nsew", columnspan=3)
             self.frame_pacientes.grid_columnconfigure(0, weight=1)
             
@@ -215,3 +215,4 @@ class JanelaPrincipal:
    
 # Inicializar a aplicação
 JanelaPrincipal()
+
