@@ -5,6 +5,7 @@ from database import carregar_pacientes_db, carregar_medicamentos_db,adicionar_p
 
 class JanelaPrincipal:
     def __init__(self):
+        
         self.root = ctk.CTk()
         self.root.title("MTC - Controle de Medicamentos")
         self.root.geometry("1200x600")
