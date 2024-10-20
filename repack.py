@@ -19,7 +19,7 @@ class JanelaPrincipal:
 
         tv_frame=CTkFrame(self.root, fg_color="lightblue", corner_radius=10, height=500)
         tv_frame.pack(fill=X,pady=40)
-
+        
 
 
         self.root.mainloop()
